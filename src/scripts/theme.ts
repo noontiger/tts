@@ -1,24 +1,18 @@
 // Constants
 const THEME = "theme";
-const LIGHT = "light";
-const DARK = "dark";
 
-// Initial color scheme
-// Can be "light", "dark", or empty string for system's prefers-color-scheme
-const initialColorScheme = "dark";
+// The 4 selectable color styles (护眼 / 科技感 / 白色 / 简约蓝)
+// light & dark are kept as valid (backward compatible) but not shown in the switcher.
+const KNOWN = ["eye", "tech", "white", "blue", "light", "dark"] as const;
+const DEFAULT_THEME = "tech";
 
+// Initial color scheme (used only when nothing is stored)
 function getPreferTheme(): string {
-  // get theme data from local storage (user's explicit choice)
   const currentTheme = localStorage.getItem(THEME);
-  if (currentTheme) return currentTheme;
-
-  // return initial color scheme if it is set (site default)
-  if (initialColorScheme) return initialColorScheme;
-
-  // return user device's prefer color scheme (system fallback)
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? DARK
-    : LIGHT;
+  if (currentTheme && (KNOWN as readonly string[]).includes(currentTheme)) {
+    return currentTheme;
+  }
+  return DEFAULT_THEME;
 }
 
 // Use existing theme value from inline script if available, otherwise detect
@@ -32,7 +26,14 @@ function setPreference(): void {
 function reflectPreference(): void {
   document.firstElementChild?.setAttribute("data-theme", themeValue);
 
-  document.querySelector("#theme-btn")?.setAttribute("aria-label", themeValue);
+  // Mark the active swatch in both desktop popover and mobile row
+  document.querySelectorAll<HTMLElement>("[data-theme-value]").forEach((el) => {
+    if (el.getAttribute("data-theme-value") === themeValue) {
+      el.setAttribute("aria-current", "true");
+    } else {
+      el.removeAttribute("aria-current");
+    }
+  });
 
   // Get a reference to the body element
   const body = document.body;
@@ -56,6 +57,10 @@ function reflectPreference(): void {
 if (window.theme) {
   window.theme.setPreference = setPreference;
   window.theme.reflectPreference = reflectPreference;
+  window.theme.setTheme = (val: string) => {
+    themeValue = val;
+  };
+  window.theme.getTheme = () => themeValue;
 } else {
   window.theme = {
     themeValue,
@@ -71,32 +76,49 @@ if (window.theme) {
 // Ensure theme is reflected (in case body wasn't ready when inline script ran)
 reflectPreference();
 
+let outsideBound = false;
+function bindOutsideClick(): void {
+  if (outsideBound) return;
+  outsideBound = true;
+  document.addEventListener("click", (e) => {
+    const wrap = document.querySelector("#theme-style-wrap");
+    if (!wrap) return;
+    const details = wrap as HTMLDetailsElement;
+    if (!details.open) return;
+    if (e.target instanceof Node && !details.contains(e.target)) {
+      details.open = false;
+    }
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const w = document.querySelector("#theme-style-wrap");
+      if (w) (w as HTMLDetailsElement).open = false;
+    }
+  });
+}
+
 function setThemeFeature(): void {
-  // set on load so screen readers can get the latest value on the button
+  // make sure active state is correct after view transitions
   reflectPreference();
 
-  // now this script can find and listen for clicks on the control
-  const toggleTheme = () => {
-    themeValue = themeValue === LIGHT ? DARK : LIGHT;
-    window.theme?.setTheme(themeValue);
-    setPreference();
-  };
+  // Bind clicks on each theme option (desktop popover + mobile row).
+  // Clone first to avoid duplicate listeners across Astro view transitions.
+  document.querySelectorAll<HTMLElement>("[data-theme-value]").forEach((item) => {
+    const fresh = item.cloneNode(true) as HTMLElement;
+    item.replaceWith(fresh);
+    fresh.addEventListener("click", () => {
+      const val = fresh.getAttribute("data-theme-value");
+      if (!val) return;
+      themeValue = val;
+      window.theme?.setTheme(themeValue);
+      setPreference();
+      // close the desktop popover if open
+      const wrap = document.querySelector("#theme-style-wrap");
+      if (wrap) (wrap as HTMLDetailsElement).open = false;
+    });
+  });
 
-  const themeBtn = document.querySelector("#theme-btn");
-  const themeBtnMobile = document.querySelector("#theme-btn-mobile");
-
-  // Remove previous listeners to avoid duplicates on view transitions
-  const freshBtn = themeBtn?.cloneNode(true) as Element | null;
-  if (themeBtn && freshBtn) {
-    themeBtn.replaceWith(freshBtn);
-    freshBtn.addEventListener("click", toggleTheme);
-  }
-
-  const freshBtnMobile = themeBtnMobile?.cloneNode(true) as Element | null;
-  if (themeBtnMobile && freshBtnMobile) {
-    themeBtnMobile.replaceWith(freshBtnMobile);
-    freshBtnMobile.addEventListener("click", toggleTheme);
-  }
+  bindOutsideClick();
 }
 
 // Set up theme features after page load
@@ -107,8 +129,8 @@ document.addEventListener("astro:after-swap", setThemeFeature);
 
 // Set theme-color value before page transition
 // to avoid navigation bar color flickering in Android dark mode
-document.addEventListener("astro:before-swap", event => {
-  const astroEvent = event;
+document.addEventListener("astro:before-swap", (event) => {
+  const astroEvent = event as any;
   const bgColor = document
     .querySelector("meta[name='theme-color']")
     ?.getAttribute("content");
@@ -119,12 +141,3 @@ document.addEventListener("astro:before-swap", event => {
       ?.setAttribute("content", bgColor);
   }
 });
-
-// sync with system changes
-window
-  .matchMedia("(prefers-color-scheme: dark)")
-  .addEventListener("change", ({ matches: isDark }) => {
-    themeValue = isDark ? DARK : LIGHT;
-    window.theme?.setTheme(themeValue);
-    setPreference();
-  });

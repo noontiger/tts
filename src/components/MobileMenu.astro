@@ -1,7 +1,5 @@
 ---
-import IconMoon from "@/assets/icons/IconMoon.svg";
 import IconSearch from "@/assets/icons/IconSearch.svg";
-import IconSunHigh from "@/assets/icons/IconSunHigh.svg";
 import { SITE } from "@/config";
 
 interface Props {
@@ -100,18 +98,21 @@ const isActive = (path: string) => {
           </button>
           {
             SITE.lightAndDarkMode && (
-              <button
-                id="theme-btn-mobile"
-                class="mobile-action-btn flex-1 justify-center"
-                title="Toggle theme"
-                aria-label="auto"
-                aria-live="polite"
-              >
-                <IconMoon class="block size-4 dark:hidden" />
-                <IconSunHigh class="hidden size-4 dark:block" />
-                <span class="block dark:hidden">Dark mode</span>
-                <span class="hidden dark:block">Light mode</span>
-              </button>
+              <div class="mobile-theme-row">
+                <span class="mobile-theme-label">配色</span>
+                <button class="mobile-theme-chip" data-theme-value="eye" aria-label="护眼">
+                  <span class="theme-dot" style="background:#5e8c61"></span>
+                </button>
+                <button class="mobile-theme-chip" data-theme-value="tech" aria-label="科技感">
+                  <span class="theme-dot" style="background:#00d9ff"></span>
+                </button>
+                <button class="mobile-theme-chip" data-theme-value="white" aria-label="白色">
+                  <span class="theme-dot" style="background:#2563eb"></span>
+                </button>
+                <button class="mobile-theme-chip" data-theme-value="blue" aria-label="简约蓝">
+                  <span class="theme-dot" style="background:#3b6fd4"></span>
+                </button>
+              </div>
             )
           }
         </div>
@@ -286,5 +287,46 @@ const isActive = (path: string) => {
     transition: color 0.2s ease, background-color 0.2s ease,
       border-color 0.2s ease;
     cursor: pointer;
+  }
+
+  /* ─── 移动端配色风格切换 ─── */
+  .mobile-theme-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1 1 100%;
+    padding: 0.25rem 0.25rem;
+  }
+  .mobile-theme-label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    margin-right: 0.25rem;
+  }
+  .mobile-theme-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
+    background: color-mix(in srgb, var(--background) 60%, transparent);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .mobile-theme-chip:hover {
+    transform: scale(1.08);
+  }
+  .mobile-theme-chip[aria-current="true"] {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+  .theme-dot {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
   }
 </style>

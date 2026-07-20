@@ -1,9 +1,7 @@
 ---
-import IconMoon from "@/assets/icons/IconMoon.svg";
 import IconSearch from "@/assets/icons/IconSearch.svg";
 import IconArchive from "@/assets/icons/IconArchive.svg";
 import IconGallery from "@/assets/icons/IconGallery.svg";
-import IconSunHigh from "@/assets/icons/IconSunHigh.svg";
 import Logo from "@/assets/logo/devosfera.svg";
 import LinkButton from "./LinkButton.astro";
 import MobileMenu from "./MobileMenu.astro";
@@ -171,17 +169,47 @@ const isActive = (path: string) => {
             </li>
             {
               SITE.lightAndDarkMode && (
-                <li class="flex items-center">
-                  <button
-                    id="theme-btn"
-                    class="nav-icon-btn relative"
-                    title="Toggles light & dark"
-                    aria-label="auto"
-                    aria-live="polite"
-                  >
-                    <IconMoon class="absolute top-1/2 left-1/2 -translate-1/2 scale-100 rotate-0 transition-all duration-300 dark:scale-0 dark:-rotate-90" />
-                    <IconSunHigh class="absolute top-1/2 left-1/2 -translate-1/2 scale-0 rotate-90 transition-all duration-300 dark:scale-100 dark:rotate-0" />
-                  </button>
+                <li class="flex items-center relative">
+                  <details id="theme-style-wrap" class="theme-style-wrap">
+                    <summary
+                      id="theme-style-btn"
+                      class="nav-icon-btn relative"
+                      title="切换配色风格"
+                      aria-label="切换配色风格"
+                    >
+                      <svg
+                        class="size-4.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10c-1.5 0-3-.5-4.5-1.5"></path>
+                        <path d="M2 12c0-1 .2-2 .5-3"></path>
+                        <circle cx="13.5" cy="6.5" r="1.5"></circle>
+                        <circle cx="17.5" cy="10.5" r="1.5"></circle>
+                        <circle cx="8.5" cy="7.5" r="1.5"></circle>
+                        <circle cx="6.5" cy="12.5" r="1.5"></circle>
+                      </svg>
+                    </summary>
+                    <div id="theme-style-menu" class="theme-style-menu" role="menu">
+                      <button class="theme-style-item" data-theme-value="eye" role="menuitem" aria-label="护眼">
+                        <span class="theme-dot" style="background:#5e8c61"></span>护眼
+                      </button>
+                      <button class="theme-style-item" data-theme-value="tech" role="menuitem" aria-label="科技感">
+                        <span class="theme-dot" style="background:#00d9ff"></span>科技感
+                      </button>
+                      <button class="theme-style-item" data-theme-value="white" role="menuitem" aria-label="白色">
+                        <span class="theme-dot" style="background:#2563eb"></span>白色
+                      </button>
+                      <button class="theme-style-item" data-theme-value="blue" role="menuitem" aria-label="简约蓝">
+                        <span class="theme-dot" style="background:#3b6fd4"></span>简约蓝
+                      </button>
+                    </div>
+                  </details>
                 </li>
               )
             }
@@ -333,6 +361,63 @@ const isActive = (path: string) => {
     border-radius: 0.5rem;
     transition: color 0.2s ease, background-color 0.2s ease;
     color: var(--foreground);
+  }
+
+  /* ─── 配色风格切换器 (护眼 / 科技感 / 白色 / 简约蓝) ─── */
+  .theme-style-wrap {
+    position: relative;
+  }
+  .theme-style-wrap > summary {
+    list-style: none;
+    cursor: pointer;
+  }
+  .theme-style-wrap > summary::-webkit-details-marker {
+    display: none;
+  }
+  .theme-style-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    min-width: 8.5rem;
+    padding: 0.375rem;
+    border-radius: 0.75rem;
+    border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+    background: color-mix(in srgb, var(--background) 95%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    z-index: 50;
+  }
+  .theme-style-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--foreground);
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .theme-style-item:hover {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+  .theme-style-item[aria-current="true"] {
+    color: var(--accent);
+  }
+  .theme-dot {
+    width: 0.875rem;
+    height: 0.875rem;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+    flex-shrink: 0;
   }
 
   /* ─── Desktop Search Button with ⌘K ─── */
