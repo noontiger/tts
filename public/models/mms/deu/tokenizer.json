@@ -1,0 +1,103 @@
+{
+    "version": "1.0",
+    "truncation": null,
+    "padding": null,
+    "added_tokens": [
+        {
+            "id": 45,
+            "content": "<unk>",
+            "single_word": false,
+            "lstrip": false,
+            "rstrip": false,
+            "normalized": false,
+            "special": true
+        }
+    ],
+    "normalizer": {
+        "type": "Sequence",
+        "normalizers": [
+            {
+                "type": "Lowercase"
+            },
+            {
+                "type": "Replace",
+                "pattern": {
+                    "Regex": "[^ v2qg\\-f18ah4\u00f63rm\u00e4lnt\u00ebdby\u00dfou_js65\u00efci\u00fcpke\u2013wz7x0]"
+                },
+                "content": ""
+            },
+            {
+                "type": "Strip",
+                "strip_left": true,
+                "strip_right": true
+            },
+            {
+                "type": "Replace",
+                "pattern": {
+                    "Regex": "(?=.)|(?<!^)$"
+                },
+                "content": " "
+            }
+        ]
+    },
+    "pre_tokenizer": {
+        "type": "Split",
+        "pattern": {
+            "Regex": ""
+        },
+        "behavior": "Isolated",
+        "invert": false
+    },
+    "post_processor": null,
+    "decoder": null,
+    "model": {
+        "vocab": {
+            " ": 0,
+            "v": 1,
+            "2": 2,
+            "q": 3,
+            "g": 4,
+            "-": 5,
+            "f": 6,
+            "1": 7,
+            "8": 8,
+            "a": 9,
+            "h": 10,
+            "4": 11,
+            "\u00f6": 12,
+            "3": 13,
+            "r": 14,
+            "m": 15,
+            "\u00e4": 16,
+            "l": 17,
+            "n": 18,
+            "t": 19,
+            "\u00eb": 20,
+            "d": 21,
+            "b": 22,
+            "y": 23,
+            "\u00df": 24,
+            "o": 25,
+            "u": 26,
+            "_": 27,
+            "j": 28,
+            "s": 29,
+            "6": 30,
+            "5": 31,
+            "\u00ef": 32,
+            "c": 33,
+            "i": 34,
+            "\u00fc": 35,
+            "p": 36,
+            "k": 37,
+            "e": 38,
+            "\u2013": 39,
+            "w": 40,
+            "z": 41,
+            "7": 42,
+            "x": 43,
+            "0": 44,
+            "<unk>": 45
+        }
+    }
+}

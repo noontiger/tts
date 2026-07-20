@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="tech">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TTS 语音合成服务 · Melo & Piper</title>
+    <meta name="description" content="浏览器端离线语音合成服务，提供 Melo 与 Piper 多语种音色。" />
+    <link rel="icon" type="image/svg+xml" href="/tts/favicon.svg" />
+    <!-- Enables cross-origin isolation (COOP/COEP) on GitHub Pages so the
+         threaded WASM build of onnxruntime-web can use SharedArrayBuffer.
+         Reloads the page once to activate; required for Melo + Piper. -->
+    <script src="/tts/coi-serviceworker.js"></script>
+    <script>
+      // Anti-FOUC: apply saved theme before paint.
+      (function () {
+        try {
+          var t = localStorage.getItem('tts-theme');
+          if (t) document.documentElement.setAttribute('data-theme', t);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="logo">🔊</span>
+          <div>
+            <h1>TTS 语音合成</h1>
+            <p class="sub">Melo · Piper — 浏览器端离线合成</p>
+          </div>
+        </div>
+        <details class="theme-wrap" id="theme-wrap">
+          <summary class="theme-btn" aria-label="切换主题">
+            <span id="theme-current">科技感</span>
+            <span class="chev">▾</span>
+          </summary>
+          <div class="theme-menu" id="theme-menu"></div>
+        </details>
+      </header>
+
+      <main class="card">
+        <div class="tabs" id="engine-tabs">
+          <button class="tab active" data-engine="melo">Melo</button>
+          <button class="tab" data-engine="piper">Piper</button>
+        </div>
+
+        <p class="engine-note" id="engine-note"></p>
+
+        <label class="field">
+          <span>输入文本</span>
+          <textarea id="text" rows="5" placeholder="在此输入要合成语音的文本……（支持中英文等多语种）"></textarea>
+        </label>
+
+        <!-- Melo controls -->
+        <div class="controls" id="melo-controls">
+          <label class="field">
+            <span>音色 / 说话人</span>
+            <select id="melo-voice"></select>
+          </label>
+        </div>
+
+        <!-- Piper controls -->
+        <div class="controls hidden" id="piper-controls">
+          <label class="field">
+            <span>语言</span>
+            <select id="piper-lang">
+              <option value="en">English</option>
+              <option value="zh">中文</option>
+              <option value="ja">日本語</option>
+              <option value="es">Español</option>
+              <option value="fr">Français</option>
+              <option value="pt">Português</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="field">
+          <span>语速：<b id="speed-val">1.0</b>x</span>
+          <input id="speed" type="range" min="0.5" max="2" step="0.1" value="1" />
+        </label>
+
+        <div class="actions">
+          <button id="synth" class="primary">▶ 开始合成</button>
+          <button id="stop" class="ghost" disabled>■ 停止</button>
+        </div>
+
+        <div class="progress hidden" id="progress">
+          <div class="bar"><div class="fill" id="progress-fill"></div></div>
+          <div class="status" id="progress-status">准备中…</div>
+        </div>
+
+        <div class="result hidden" id="result">
+          <audio id="audio" controls></audio>
+          <a id="download" class="download" download="tts.wav">⬇ 下载 WAV</a>
+        </div>
+
+        <p class="err hidden" id="error"></p>
+      </main>
+
+      <footer class="foot">
+        <span>所有推理均在你的浏览器本地完成，数据不会上传。</span>
+      </footer>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
